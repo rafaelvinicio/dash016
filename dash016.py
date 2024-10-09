@@ -8,15 +8,18 @@ st.set_page_config(
     page_title="Dashboard de Inscrições do Edital",
     page_icon="📈",
     layout="wide",  # Mantém o layout 'wide' para permitir personalização
-    initial_sidebar_state="collapsed"  # Colapsa a barra laterala
+    initial_sidebar_state="collapsed"  # Colapsa a barra lateral
 )
 
 # Forçar o tema claro do Streamlit
 st.markdown(
     """
-    <style>
+     <style>
         html, body, [data-testid="stAppViewContainer"]  {
             color-scheme: light;
+        }
+        .stTextInput input {
+            background-color: #9B9B9B;  /* Define o fundo do campo de entrada para cinza claro */
         }
     </style>
     """,
@@ -57,7 +60,7 @@ st.markdown("---")
 # Barra lateral - apenas configurações gerais
 with st.sidebar:
     st.markdown("## Configurações")
-    rows_per_page = st.slider('Linhas por página', min_value=10, max_value=100, value=50, step=10)
+    rows_per_page = st.selectbox('Linhas por página', options=[25, 50, 100], index=0)
 
 # Função para carregar os dados da planilha
 @st.cache_data
@@ -176,8 +179,10 @@ if search_term:
 gb = GridOptionsBuilder.from_dataframe(df_selected)
 gb.configure_default_column(editable=False, groupable=False)
 gb.configure_column("VAGA", header_name="Vaga", sortable=True, filter=True, width=600)
-gb.configure_column("INSCRITOS", header_name="Inscritos", sortable=True, filter=True, width=0)
+gb.configure_column("INSCRITOS", header_name="Inscritos", sortable=True, filter=True, width=100)
 gb.configure_pagination(paginationAutoPageSize=False, paginationPageSize=rows_per_page)
+gb.configure_grid_options(rowHeight=25)  # Reduz o espaçamento entre linhas
+gb.configure_default_column(cellStyle={'font-size': '11px'})  # Reduz o tamanho da fonte
 
 gridOptions = gb.build()
 
@@ -203,7 +208,7 @@ AgGrid(
     df_selected,
     gridOptions=gridOptions,
     enable_enterprise_modules=False,
-    height=1000,
+    height=800,
     fit_columns_on_grid_load=True,
     theme=cor_tema,
     enable_pagination=True,
