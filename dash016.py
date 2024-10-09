@@ -9,6 +9,7 @@ st.set_page_config(
     page_icon="📈",
     layout="wide",  # Mantém o layout 'wide' para permitir personalização
     initial_sidebar_state="collapsed",  # Colapsa a barra lateral
+    theme="light"
 )
 
 # Forçar o tema claro do Streamlit
@@ -49,7 +50,7 @@ st.markdown(
 )
 
 st.markdown(
-    "<h1 style='text-align: center; color: #2E4053; font-size: 24px;'>📈 Dashboard de Inscrições do Edital 016/2024 📈</h1>",
+    "<h1 style='text-align: center; color: #2E4053; font-size: 24px;'>📈 Dashboard de Inscrições do Edital 016/2024 ParaíbaTEC - FIC 📈</h1>",
     unsafe_allow_html=True
 )
 st.markdown("---")
@@ -134,7 +135,7 @@ st.markdown("---")
 
 # Centralizar o gráfico Altair
 st.markdown(
-    "<h2 style='text-align: center; color: #2E4053;'>Distribuição de Inscrições por Cargo</h2>",
+    "<h2 style='text-align: center; color: #2E4053;'>Distribuição de Inscrições por Função</h2>",
     unsafe_allow_html=True
 )
 
@@ -176,7 +177,7 @@ if search_term:
 gb = GridOptionsBuilder.from_dataframe(df_selected)
 gb.configure_default_column(editable=False, groupable=False)
 gb.configure_column("VAGA", header_name="Vaga", sortable=True, filter=True, width=600)
-gb.configure_column("INSCRITOS", header_name="Inscritos", sortable=True, filter=True, width=0)
+gb.configure_column("INSCRITOS", header_name="Inscritos", sortable=True, filter=True, width=100)
 gb.configure_pagination(paginationAutoPageSize=False, paginationPageSize=rows_per_page)
 
 gridOptions = gb.build()
