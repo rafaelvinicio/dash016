@@ -203,7 +203,7 @@ AgGrid(
     df_selected,
     gridOptions=gridOptions,
     enable_enterprise_modules=False,
-    height=800,
+    height=1000,
     fit_columns_on_grid_load=True,
     theme=cor_tema,
     enable_pagination=True,
