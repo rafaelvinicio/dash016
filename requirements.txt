@@ -1,0 +1,4 @@
+pandas
+streamlit
+st_aggrid
+altair
