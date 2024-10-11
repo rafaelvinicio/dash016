@@ -63,7 +63,7 @@ with st.sidebar:
     rows_per_page = st.selectbox('Linhas por página', options=[25, 50, 100], index=0)
 
 # Função para carregar os dados da planilha
-@st.cache_data
+@st.cache_data(ttl=200)
 def load_data(spreadsheet_id, sheet_name):
     try:
         csv_export_url = f'https://docs.google.com/spreadsheets/d/{spreadsheet_id}/gviz/tq?tqx=out:csv&sheet={sheet_name}'
