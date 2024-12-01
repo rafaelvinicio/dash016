@@ -125,7 +125,7 @@ with col1:
         "<h3 style='text-align: center; font-size: 20px;'>Total de Inscritos</h3>",
         unsafe_allow_html=True
     )
-    total_inscritos = total_inscritos_prof + total_inscritos_sup = total_inscritos_ap
+    total_inscritos = total_inscritos_prof + total_inscritos_sup + total_inscritos_ap
     st.markdown(
         f"<h1 style='text-align: center; font-size: 24px;'>{total_inscritos}</h1>",
         unsafe_allow_html=True
