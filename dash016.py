@@ -104,7 +104,7 @@ else:
 if 'VAGA' in df_ap.columns and 'INSCRITOS' in df_ap.columns:
     df_ap = df_ap[['VAGA', 'INSCRITOS']].sort_values(by='INSCRITOS', ascending=False)
 else:
-    st.error("As colunas 'VAGA' e 'INSCRITOS' não foram encontradas na aba 'sup'.")
+    st.error("As colunas 'VAGA' e 'INSCRITOS' não foram encontradas na aba 'ap'.")
 
 # Calculate total inscriptions
 total_inscritos_prof = df_prof['INSCRITOS'].sum()
@@ -235,7 +235,7 @@ AgGrid(
     df_selected,
     gridOptions=gridOptions,
     enable_enterprise_modules=False,
-    height=800,
+    height=350,
     fit_columns_on_grid_load=True,
     theme=cor_tema,
     enable_pagination=True,
