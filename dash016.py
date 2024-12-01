@@ -102,7 +102,7 @@ if 'VAGA' in df_sup.columns and 'INSCRITOS' in df_sup.columns:
 else:
     st.error("As colunas 'VAGA' e 'INSCRITOS' não foram encontradas na aba 'sup'.")
 if 'VAGA' in df_ap.columns and 'INSCRITOS' in df_ap.columns:
-    df_sup = df_ap[['VAGA', 'INSCRITOS']].sort_values(by='INSCRITOS', ascending=False)
+    df_ap = df_ap[['VAGA', 'INSCRITOS']].sort_values(by='INSCRITOS', ascending=False)
 else:
     st.error("As colunas 'VAGA' e 'INSCRITOS' não foram encontradas na aba 'sup'.")
 
