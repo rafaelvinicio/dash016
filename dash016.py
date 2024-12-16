@@ -62,7 +62,7 @@ st.markdown(
 )
 
 st.markdown(
-    "<h1 style='text-align: center; font-size: 24px;'>📈 Dashboard de Inscrições do Edital 027/2024 📈</h1>",
+    "<h1 style='text-align: center; font-size: 24px;'>📈 Dashboard de Inscrições do Edital 032/2024 📈</h1>",
     unsafe_allow_html=True
 )
 st.markdown("---")
@@ -84,12 +84,11 @@ def load_data(spreadsheet_id, sheet_name):
         return pd.DataFrame()
 
 # Spreadsheet ID
-spreadsheet_id = '1AqbLEIwV_gsDwrw8nLYFq0M4t3LBw28X1dQCI86_Mrs'
+spreadsheet_id = '1-_7hvxUUddzccc7KnEPZzg36HRP0eH6KabLro9AR_zk'
 
 # Load 'prof' and 'sup' sheets
 df_prof = load_data(spreadsheet_id, 'dashprof')
 df_sup = load_data(spreadsheet_id, 'dashsup')
-df_ap = load_data(spreadsheet_id, 'dashap')
 
 # Check if 'VAGA' and 'INSCRITOS' columns exist and sort DataFrames
 if 'VAGA' in df_prof.columns and 'INSCRITOS' in df_prof.columns:
@@ -101,31 +100,26 @@ if 'VAGA' in df_sup.columns and 'INSCRITOS' in df_sup.columns:
     df_sup = df_sup[['VAGA', 'INSCRITOS']].sort_values(by='INSCRITOS', ascending=False)
 else:
     st.error("As colunas 'VAGA' e 'INSCRITOS' não foram encontradas na aba 'sup'.")
-if 'VAGA' in df_ap.columns and 'INSCRITOS' in df_ap.columns:
-    df_ap = df_ap[['VAGA', 'INSCRITOS']].sort_values(by='INSCRITOS', ascending=False)
-else:
-    st.error("As colunas 'VAGA' e 'INSCRITOS' não foram encontradas na aba 'ap'.")
 
 # Calculate total inscriptions
 total_inscritos_prof = df_prof['INSCRITOS'].sum()
 total_inscritos_sup = df_sup['INSCRITOS'].sum()
-total_inscritos_ap = df_ap['INSCRITOS'].sum()
 
 # DataFrame with totals
 df_totals = pd.DataFrame({
-    'Cargo': ['Professor', 'Supervisor', 'Apoio'],
-    'Total de Inscrições': [total_inscritos_prof, total_inscritos_sup, total_inscritos_ap]
+    'Cargo': ['Professor', 'Supervisor'],
+    'Total de Inscrições': [total_inscritos_prof, total_inscritos_sup]
 })
 
 # Divide into columns for KPIs
-col1, col2, col3, col4 = st.columns(4)
+col1, col2, col3 = st.columns(3)
 
 with col1:
     st.markdown(
         "<h3 style='text-align: center; font-size: 20px;'>Total de Inscritos</h3>",
         unsafe_allow_html=True
     )
-    total_inscritos = total_inscritos_prof + total_inscritos_sup + total_inscritos_ap
+    total_inscritos = total_inscritos_prof + total_inscritos_sup
     st.markdown(
         f"<h1 style='text-align: center; font-size: 24px;'>{total_inscritos}</h1>",
         unsafe_allow_html=True
@@ -148,15 +142,7 @@ with col3:
         f"<h1 style='text-align: center; font-size: 24px;'>{total_inscritos_sup}</h1>",
         unsafe_allow_html=True
     )
-with col4:
-    st.markdown(
-        "<h3 style='text-align: center; font-size: 20px;'>Inscritos - Apoio</h3>",
-        unsafe_allow_html=True
-    )
-    st.markdown(
-        f"<h1 style='text-align: center; font-size: 24px;'>{total_inscritos_ap}</h1>",
-        unsafe_allow_html=True
-    )
+
 
 st.markdown("---")
 
@@ -182,7 +168,7 @@ st.altair_chart(chart, use_container_width=True)
 st.markdown("---")
 
 # Selection of Professor or Supervisor above the table
-cargo_selecionado = st.radio('SELECIONE O CARGO', ['PROFESSOR', 'SUPERVISOR', 'APOIO'])
+cargo_selecionado = st.radio('SELECIONE O CARGO', ['PROFESSOR', 'SUPERVISOR'])
 
 # Search field
 search_term = st.text_input('BUSCAR POR CIDADE OU VAGA')
@@ -194,9 +180,7 @@ if cargo_selecionado == 'PROFESSOR':
 elif cargo_selecionado == 'SUPERVISOR':
     df_selected = df_sup.copy()
     cor_tema = 'material'
-elif cargo_selecionado == 'APOIO':
-    df_selected = df_ap.copy()
-    cor_tema = 'material'
+
 
 # Filter the DataFrame based on the search term
 if search_term:
