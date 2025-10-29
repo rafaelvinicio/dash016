@@ -62,7 +62,7 @@ st.markdown(
 )
 
 st.markdown(
-    "<h1 style='text-align: center; font-size: 24px;'>📈 Dashboard de Inscrições do Edital 008/2025 📈</h1>",
+    "<h1 style='text-align: center; font-size: 24px;'>📈 Dashboard de Inscrições do Edital 030/2025 📈</h1>",
     unsafe_allow_html=True
 )
 st.markdown("---")
@@ -84,7 +84,7 @@ def load_data(spreadsheet_id, sheet_name):
         return pd.DataFrame()
 
 # Spreadsheet ID
-spreadsheet_id = '1V8vzQCjBboFyU8dU18bWHYS_kTHn4DICqENOn159wzM'
+spreadsheet_id = '1TtvSvg_oFJ_vmWxrZh2f44bIX5yhfISISGj0sb6nSME'
 
 # Load 'prof' and 'sup' sheets
 df_prof = load_data(spreadsheet_id, 'dashprof')
