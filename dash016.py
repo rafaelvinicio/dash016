@@ -62,7 +62,7 @@ st.markdown(
 )
 
 st.markdown(
-    "<h1 style='text-align: center; font-size: 24px;'>📈 Dashboard de Inscrições do Edital 030/2025 📈</h1>",
+    "<h1 style='text-align: center; font-size: 24px;'>📈 Dashboard de Inscrições do Edital 026/2025 📈</h1>",
     unsafe_allow_html=True
 )
 st.markdown("---")
@@ -84,7 +84,7 @@ def load_data(spreadsheet_id, sheet_name):
         return pd.DataFrame()
 
 # Spreadsheet ID
-spreadsheet_id = '1TtvSvg_oFJ_vmWxrZh2f44bIX5yhfISISGj0sb6nSME'
+spreadsheet_id = '1wl3W1249brMi--ds-4KL2poBJSJ2jKpDKZAfAogGLrQ'
 
 # Load 'prof' and 'sup' sheets
 df_prof = load_data(spreadsheet_id, 'dashprof')
@@ -107,8 +107,8 @@ total_inscritos_sup = df_sup['INSCRITOS'].sum()
 
 # DataFrame with totals
 df_totals = pd.DataFrame({
-    'Cargo': ['Supervisor', 'Professor'],
-    'Total de Inscrições': [total_inscritos_sup, total_inscritos_prof]
+    'Cargo': ['Professor', 'Supervisor'],
+    'Total de Inscrições': [total_inscritos_prof, total_inscritos_sup]
 })
 
 # Divide into columns for KPIs
