@@ -1,4 +1,4 @@
 pandas
 streamlit
 streamlit-aggrid
-altair
+altair<5
