@@ -1,47 +1,31 @@
 import streamlit as st
 import pandas as pd
 from st_aggrid import AgGrid, GridOptionsBuilder
-import altair as alt  # Import Altair for static charts
+import altair as alt
 
-# Page configuration to hide the sidebar navigation by default
+# Page configuration
 st.set_page_config(
     page_title="Dashboard de Inscrições do Edital",
     page_icon="📈",
-    layout="wide",  # Keep 'wide' layout for customization
-    initial_sidebar_state="collapsed"  # Collapse the sidebar
+    layout="wide",
+    initial_sidebar_state="collapsed"
 )
 
 # Theme-aware CSS styles
 st.markdown(
     """
     <style>
-        /* Adjust the block container's width and padding */
         .block-container {
-            max-width: 1000px; /* Set desired maximum width in pixels */
+            max-width: 1000px;
             padding-left: 1rem;
             padding-right: 1rem;
-            margin: 0 auto; /* Center the content */
+            margin: 0 auto;
         }
-
-        /* Center the banner */
         .centered-banner img {
             display: block;
             margin-left: auto;
             margin-right: auto;
         }
-
-        /* Style headers to use theme colors */
-        h1, h2, h3, h4, h5, h6 {
-            color: var(--text-color);
-        }
-
-        /* Style the text input to match theme */
-        .stTextInput input {
-            background-color: var(--secondary-background-color);
-            color: var(--text-color);
-        }
-
-        /* Style the AgGrid component */
         .ag-theme-material {
             max-width: 700px;
             margin: 0 auto;
@@ -51,7 +35,7 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-# Header - Center the banner
+# Header
 st.markdown(
     """
     <div class="centered-banner">
@@ -67,17 +51,27 @@ st.markdown(
 )
 st.markdown("---")
 
-# Sidebar - only general settings
+# Sidebar
 with st.sidebar:
     st.markdown("## Configurações")
     rows_per_page = st.selectbox('Linhas por página', options=[25, 50, 100], index=0)
 
-# Função para carregar os dados da planilha
+# Function to load data
 @st.cache_data(ttl=200)
 def load_data(spreadsheet_id, sheet_name):
     try:
         csv_export_url = f'https://docs.google.com/spreadsheets/d/{spreadsheet_id}/gviz/tq?tqx=out:csv&sheet={sheet_name}'
         df = pd.read_csv(csv_export_url)
+        
+        # Clean column names
+        df.columns = df.columns.str.strip()
+        
+        # Ensure data types are correct
+        if 'VAGA' in df.columns:
+            df['VAGA'] = df['VAGA'].astype(str).str.strip()
+        if 'INSCRITOS' in df.columns:
+            df['INSCRITOS'] = pd.to_numeric(df['INSCRITOS'], errors='coerce').fillna(0).astype(int)
+        
         return df
     except Exception as e:
         st.error(f"Erro ao carregar a aba '{sheet_name}': {e}")
@@ -86,32 +80,29 @@ def load_data(spreadsheet_id, sheet_name):
 # Spreadsheet ID
 spreadsheet_id = '1wl3W1249brMi--ds-4KL2poBJSJ2jKpDKZAfAogGLrQ'
 
-# Load 'prof' and 'sup' sheets
+# Load data
 df_prof = load_data(spreadsheet_id, 'dashprof')
 df_sup = load_data(spreadsheet_id, 'dashsup')
 
-# Check if 'VAGA' and 'INSCRITOS' columns exist and sort DataFrames
-if 'VAGA' in df_prof.columns and 'INSCRITOS' in df_prof.columns:
-    df_prof = df_prof[['VAGA', 'INSCRITOS']].sort_values(by='INSCRITOS', ascending=False)
+# Validate and prepare data
+if not df_prof.empty and 'VAGA' in df_prof.columns and 'INSCRITOS' in df_prof.columns:
+    df_prof = df_prof[['VAGA', 'INSCRITOS']].sort_values(by='INSCRITOS', ascending=False).reset_index(drop=True)
 else:
     st.error("As colunas 'VAGA' e 'INSCRITOS' não foram encontradas na aba 'prof'.")
+    df_prof = pd.DataFrame({'VAGA': [], 'INSCRITOS': []})
 
-if 'VAGA' in df_sup.columns and 'INSCRITOS' in df_sup.columns:
-    df_sup = df_sup[['VAGA', 'INSCRITOS']].sort_values(by='INSCRITOS', ascending=False)
+if not df_sup.empty and 'VAGA' in df_sup.columns and 'INSCRITOS' in df_sup.columns:
+    df_sup = df_sup[['VAGA', 'INSCRITOS']].sort_values(by='INSCRITOS', ascending=False).reset_index(drop=True)
 else:
     st.error("As colunas 'VAGA' e 'INSCRITOS' não foram encontradas na aba 'sup'.")
+    df_sup = pd.DataFrame({'VAGA': [], 'INSCRITOS': []})
 
-# Calculate total inscriptions
-total_inscritos_prof = df_prof['INSCRITOS'].sum()
-total_inscritos_sup = df_sup['INSCRITOS'].sum()
+# Calculate totals
+total_inscritos_prof = int(df_prof['INSCRITOS'].sum()) if not df_prof.empty else 0
+total_inscritos_sup = int(df_sup['INSCRITOS'].sum()) if not df_sup.empty else 0
+total_inscritos = total_inscritos_prof + total_inscritos_sup
 
-# DataFrame with totals
-df_totals = pd.DataFrame({
-    'Cargo': ['Professor', 'Supervisor'],
-    'Total de Inscrições': [total_inscritos_prof, total_inscritos_sup]
-})
-
-# Divide into columns for KPIs
+# KPIs
 col1, col2, col3 = st.columns(3)
 
 with col1:
@@ -119,11 +110,11 @@ with col1:
         "<h3 style='text-align: center; font-size: 20px;'>Total de Inscritos</h3>",
         unsafe_allow_html=True
     )
-    total_inscritos = total_inscritos_prof + total_inscritos_sup
     st.markdown(
         f"<h1 style='text-align: center; font-size: 24px;'>{total_inscritos}</h1>",
         unsafe_allow_html=True
     )
+
 with col2:
     st.markdown(
         "<h3 style='text-align: center; font-size: 20px;'>Inscritos - Professor</h3>",
@@ -133,6 +124,7 @@ with col2:
         f"<h1 style='text-align: center; font-size: 24px;'>{total_inscritos_prof}</h1>",
         unsafe_allow_html=True
     )
+
 with col3:
     st.markdown(
         "<h3 style='text-align: center; font-size: 20px;'>Inscritos - Supervisor</h3>",
@@ -143,20 +135,23 @@ with col3:
         unsafe_allow_html=True
     )
 
-
 st.markdown("---")
 
-# Center the Altair chart
+# Chart
 st.markdown(
     "<h2 style='text-align: center;'>Distribuição de Inscrições por Cargo</h2>",
     unsafe_allow_html=True
 )
 
-# Define the 'chart'
+df_totals = pd.DataFrame({
+    'Cargo': ['Professor', 'Supervisor'],
+    'Total de Inscrições': [total_inscritos_prof, total_inscritos_sup]
+})
+
 chart = alt.Chart(df_totals).mark_bar().encode(
     x=alt.X('Cargo:N', axis=alt.Axis(labelFontSize=14, titleFontSize=16)),
     y=alt.Y('Total de Inscrições:Q', axis=alt.Axis(labelFontSize=14, titleFontSize=16)),
-    color=alt.Color('Cargo:N', legend=None, scale=alt.Scale(scheme='tableau10')),  # Use theme-friendly color scheme
+    color=alt.Color('Cargo:N', legend=None, scale=alt.Scale(scheme='tableau10')),
     tooltip=['Cargo', 'Total de Inscrições']
 ).properties(
     width=500,
@@ -167,64 +162,46 @@ st.altair_chart(chart, use_container_width=True)
 
 st.markdown("---")
 
-# Selection of Professor or Supervisor above the table
-cargo_selecionado = st.radio('SELECIONE O CARGO', ['PROFESSOR', 'SUPERVISOR'])
+# Selection and search
+cargo_selecionado = st.radio('SELECIONE O CARGO', ['PROFESSOR', 'SUPERVISOR'], key='cargo_radio')
+search_term = st.text_input('BUSCAR POR CIDADE OU VAGA', key='search_input')
 
-# Search field
-search_term = st.text_input('BUSCAR POR CIDADE OU VAGA')
+# Select DataFrame
+df_selected = df_prof.copy() if cargo_selecionado == 'PROFESSOR' else df_sup.copy()
 
-# Select the corresponding DataFrame
-if cargo_selecionado == 'PROFESSOR':
-    df_selected = df_prof.copy()
-    cor_tema = 'material'
-elif cargo_selecionado == 'SUPERVISOR':
-    df_selected = df_sup.copy()
-    cor_tema = 'material'
-
-
-# Filter the DataFrame based on the search term
+# Filter
 if search_term:
-    df_selected = df_selected[df_selected['VAGA'].str.contains(search_term, case=False, na=False)]
+    df_selected = df_selected[df_selected['VAGA'].str.contains(search_term, case=False, na=False)].reset_index(drop=True)
 
-# Configure AgGrid
-gb = GridOptionsBuilder.from_dataframe(df_selected)
-gb.configure_default_column(editable=False, groupable=False)
-gb.configure_column("VAGA", header_name="Vaga", sortable=True, filter=True, width=600)
-gb.configure_column("INSCRITOS", header_name="Inscritos", sortable=True, filter=True, width=100)
-gb.configure_pagination(paginationAutoPageSize=False, paginationPageSize=rows_per_page)
-gb.configure_grid_options(rowHeight=25)  # Reduce row spacing
-gb.configure_default_column(cellStyle={'font-size': '11px'})  # Reduce font size
-
-gridOptions = gb.build()
-
-# Style to narrow the AgGrid component
-st.markdown(
-    """
-    <style>
-        .ag-theme-material {
-            max-width: 700px;  /* Adjust the maximum width to narrow the component */
-            margin: 0 auto;  /* Center the component on the page */
-        }
-    </style>
-    """,
-    unsafe_allow_html=True
-)
-
-st.markdown(
-    f"<h2 style='text-align: center;'>Inscrições - {cargo_selecionado}</h2>",
-    unsafe_allow_html=True
-)
-
-AgGrid(
-    df_selected,
-    gridOptions=gridOptions,
-    enable_enterprise_modules=False,
-    height=350,
-    fit_columns_on_grid_load=True,
-    theme=cor_tema,
-    enable_pagination=True,
-    reload_data=True
-)
+# AgGrid configuration
+if not df_selected.empty:
+    gb = GridOptionsBuilder.from_dataframe(df_selected)
+    gb.configure_default_column(editable=False, groupable=False)
+    gb.configure_column("VAGA", header_name="Vaga", sortable=True, filter=True, width=600)
+    gb.configure_column("INSCRITOS", header_name="Inscritos", sortable=True, filter=True, width=100)
+    gb.configure_pagination(paginationAutoPageSize=False, paginationPageSize=rows_per_page)
+    gb.configure_grid_options(rowHeight=25)
+    gb.configure_default_column(cellStyle={'font-size': '11px'})
+    
+    gridOptions = gb.build()
+    
+    st.markdown(
+        f"<h2 style='text-align: center;'>Inscrições - {cargo_selecionado}</h2>",
+        unsafe_allow_html=True
+    )
+    
+    AgGrid(
+        df_selected,
+        gridOptions=gridOptions,
+        enable_enterprise_modules=False,
+        height=350,
+        fit_columns_on_grid_load=True,
+        theme='material',
+        update_mode='MODEL_CHANGED',
+        key=f'aggrid_{cargo_selecionado}'
+    )
+else:
+    st.info("Nenhum dado encontrado para os filtros selecionados.")
 
 # Footer
 st.markdown("---")
