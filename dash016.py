@@ -11,31 +11,174 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# Theme-aware CSS styles
 st.markdown(
     """
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;600;700&display=swap');
+
+        html, body, [class*="css"] {
+            font-family: 'DM Sans', sans-serif;
+        }
+
         .block-container {
-            max-width: 1000px;
-            padding-left: 1rem;
-            padding-right: 1rem;
+            max-width: 1100px;
+            padding-left: 2rem;
+            padding-right: 2rem;
+            padding-top: 1.5rem;
             margin: 0 auto;
         }
+
         .centered-banner img {
             display: block;
             margin-left: auto;
             margin-right: auto;
+            border-radius: 12px;
         }
+
+        /* KPI Grid */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin: 24px 0;
+        }
+
+        .kpi-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 24px 20px;
+            text-align: center;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .kpi-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 24px rgba(43,108,176,0.12);
+        }
+
+        .kpi-label {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: #64748b;
+            margin-bottom: 10px;
+        }
+
+        .kpi-value {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 42px;
+            font-weight: 700;
+            color: #1e293b;
+            line-height: 1;
+        }
+
+        .kpi-value.accent { color: #2b6cb0; }
+        .kpi-value.green  { color: #276749; }
+        .kpi-value.orange { color: #c05621; }
+
+        .kpi-sub {
+            font-size: 11px;
+            color: #94a3b8;
+            margin-top: 8px;
+        }
+
+        /* Section title */
+        .section-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 18px;
+            font-weight: 600;
+            color: #1e293b;
+            text-align: center;
+            letter-spacing: 0.5px;
+            margin: 8px 0 16px 0;
+        }
+
+        /* Divider */
+        .styled-divider {
+            border: none;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(43,108,176,0.25), transparent);
+            margin: 28px 0;
+        }
+
+        /* Radio buttons */
+        div[role="radiogroup"] {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+
+        div[role="radiogroup"] label {
+            background: #f8fafc;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            padding: 8px 20px;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        /* Search input */
+        .stTextInput input {
+            background: #f8fafc !important;
+            border: 1px solid #cbd5e1 !important;
+            border-radius: 10px !important;
+            color: #1e293b !important;
+            font-family: 'DM Sans', sans-serif !important;
+            font-size: 14px !important;
+            padding: 10px 16px !important;
+        }
+
+        /* AgGrid wrapper */
         .ag-theme-material {
-            max-width: 700px;
+            max-width: 800px;
             margin: 0 auto;
+            border-radius: 12px;
+            overflow: hidden;
         }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            font-size: 12px;
+            color: #94a3b8;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            padding: 16px 0 8px 0;
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        /* Status badges */
+        .badge-row {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            margin-top: 10px;
+        }
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.6px;
+            padding: 4px 12px;
+            border-radius: 20px;
+        }
+        .badge-valid   { background: rgba(39,103,73,0.08);  color: #276749; border: 1px solid rgba(39,103,73,0.25); }
+        .badge-invalid { background: rgba(192,86,33,0.08);  color: #c05621; border: 1px solid rgba(192,86,33,0.25); }
     </style>
     """,
     unsafe_allow_html=True
 )
 
-# Header
+# ── Banner ──────────────────────────────────────────────────────────────────
 st.markdown(
     """
     <div class="centered-banner">
@@ -46,155 +189,220 @@ st.markdown(
 )
 
 st.markdown(
-    "<h1 style='text-align: center; font-size: 24px;'>📈 Dashboard de Inscrições do Edital 026/2025 📈</h1>",
+    "<h1 style='text-align:center;font-family:Space Grotesk,sans-serif;font-size:22px;"
+    "font-weight:700;color:#1e293b;margin:18px 0 4px 0;letter-spacing:0.5px;'>"
+    "📈 Dashboard de Inscrições · Edital 004/2026</h1>",
     unsafe_allow_html=True
 )
-st.markdown("---")
 
-# Sidebar
+st.markdown("<hr class='styled-divider'>", unsafe_allow_html=True)
+
+# ── Sidebar ──────────────────────────────────────────────────────────────────
 with st.sidebar:
-    st.markdown("## Configurações")
+    st.markdown("## ⚙️ Configurações")
     rows_per_page = st.selectbox('Linhas por página', options=[25, 50, 100], index=0)
 
-# Function to load data
+# ── Load data ────────────────────────────────────────────────────────────────
+SPREADSHEET_ID = '1p0GTkCTsUcFbGWUUh8wwL5QdKXijtMf6x7fa88orlEk'
+EXPECTED_COLS = ['VAGA', 'INSCRITOS', 'VALIDADOS', 'INVALIDADOS']
+
 @st.cache_data(ttl=200)
 def load_data(spreadsheet_id, sheet_name):
     try:
-        csv_export_url = f'https://docs.google.com/spreadsheets/d/{spreadsheet_id}/gviz/tq?tqx=out:csv&sheet={sheet_name}'
-        df = pd.read_csv(csv_export_url)
-        
-        # Clean column names
+        url = (
+            f'https://docs.google.com/spreadsheets/d/{spreadsheet_id}'
+            f'/gviz/tq?tqx=out:csv&sheet={sheet_name}'
+        )
+        df = pd.read_csv(url)
         df.columns = df.columns.str.strip()
-        
-        # Ensure data types are correct
+        for col in ['INSCRITOS', 'VALIDADOS', 'INVALIDADOS']:
+            if col in df.columns:
+                df[col] = pd.to_numeric(df[col], errors='coerce').fillna(0).astype(int)
         if 'VAGA' in df.columns:
             df['VAGA'] = df['VAGA'].astype(str).str.strip()
-        if 'INSCRITOS' in df.columns:
-            df['INSCRITOS'] = pd.to_numeric(df['INSCRITOS'], errors='coerce').fillna(0).astype(int)
-        
         return df
     except Exception as e:
-        st.error(f"Erro ao carregar a aba '{sheet_name}': {e}")
+        st.error(f"Erro ao carregar '{sheet_name}': {e}")
         return pd.DataFrame()
 
-# Spreadsheet ID
-spreadsheet_id = '1wl3W1249brMi--ds-4KL2poBJSJ2jKpDKZAfAogGLrQ'
-
-# Load data
-df_prof = load_data(spreadsheet_id, 'dashprof')
-df_sup = load_data(spreadsheet_id, 'dashsup')
-
-# Validate and prepare data
-if not df_prof.empty and 'VAGA' in df_prof.columns and 'INSCRITOS' in df_prof.columns:
-    df_prof = df_prof[['VAGA', 'INSCRITOS']].sort_values(by='INSCRITOS', ascending=False).reset_index(drop=True)
-else:
-    st.error("As colunas 'VAGA' e 'INSCRITOS' não foram encontradas na aba 'prof'.")
-    df_prof = pd.DataFrame({'VAGA': [], 'INSCRITOS': []})
-
-if not df_sup.empty and 'VAGA' in df_sup.columns and 'INSCRITOS' in df_sup.columns:
-    df_sup = df_sup[['VAGA', 'INSCRITOS']].sort_values(by='INSCRITOS', ascending=False).reset_index(drop=True)
-else:
-    st.error("As colunas 'VAGA' e 'INSCRITOS' não foram encontradas na aba 'sup'.")
-    df_sup = pd.DataFrame({'VAGA': [], 'INSCRITOS': []})
-
-# Calculate totals
-total_inscritos_prof = int(df_prof['INSCRITOS'].sum()) if not df_prof.empty else 0
-total_inscritos_sup = int(df_sup['INSCRITOS'].sum()) if not df_sup.empty else 0
-total_inscritos = total_inscritos_prof + total_inscritos_sup
-
-# KPIs
-col1, col2, col3 = st.columns(3)
-
-with col1:
-    st.markdown(
-        "<h3 style='text-align: center; font-size: 20px;'>Total de Inscritos</h3>",
-        unsafe_allow_html=True
-    )
-    st.markdown(
-        f"<h1 style='text-align: center; font-size: 24px;'>{total_inscritos}</h1>",
-        unsafe_allow_html=True
+def prepare(df, label):
+    missing = [c for c in EXPECTED_COLS if c not in df.columns]
+    if df.empty or missing:
+        if missing:
+            st.warning(f"Colunas ausentes em '{label}': {missing}")
+        return pd.DataFrame({c: [] for c in EXPECTED_COLS})
+    return (
+        df[EXPECTED_COLS]
+        .sort_values('INSCRITOS', ascending=False)
+        .reset_index(drop=True)
     )
 
-with col2:
-    st.markdown(
-        "<h3 style='text-align: center; font-size: 20px;'>Inscritos - Professor</h3>",
-        unsafe_allow_html=True
-    )
-    st.markdown(
-        f"<h1 style='text-align: center; font-size: 24px;'>{total_inscritos_prof}</h1>",
-        unsafe_allow_html=True
+df_prof  = prepare(load_data(SPREADSHEET_ID, 'dashprof'),  'dashprof')
+df_sup   = prepare(load_data(SPREADSHEET_ID, 'dashsup'),   'dashsup')
+df_apoio = prepare(load_data(SPREADSHEET_ID, 'dashapoio'), 'dashapoio')
+
+def totals(df):
+    if df.empty:
+        return 0, 0, 0
+    return (
+        int(df['INSCRITOS'].sum()),
+        int(df['VALIDADOS'].sum()),
+        int(df['INVALIDADOS'].sum()),
     )
 
-with col3:
-    st.markdown(
-        "<h3 style='text-align: center; font-size: 20px;'>Inscritos - Supervisor</h3>",
-        unsafe_allow_html=True
-    )
-    st.markdown(
-        f"<h1 style='text-align: center; font-size: 24px;'>{total_inscritos_sup}</h1>",
-        unsafe_allow_html=True
-    )
+t_prof_i,  t_prof_v,  t_prof_x  = totals(df_prof)
+t_sup_i,   t_sup_v,   t_sup_x   = totals(df_sup)
+t_apoio_i, t_apoio_v, t_apoio_x = totals(df_apoio)
 
-st.markdown("---")
+total_i = t_prof_i  + t_sup_i  + t_apoio_i
+total_v = t_prof_v  + t_sup_v  + t_apoio_v
+total_x = t_prof_x  + t_sup_x  + t_apoio_x
 
-# Chart
+# ── KPI cards ────────────────────────────────────────────────────────────────
+def kpi_card(label, value, css_class="", sub=""):
+    sub_html = f"<div class='kpi-sub'>{sub}</div>" if sub else ""
+    return f"""
+    <div class="kpi-card">
+        <div class="kpi-label">{label}</div>
+        <div class="kpi-value {css_class}">{value:,}</div>
+        {sub_html}
+    </div>
+    """
+
+# Row 1 – grand totals
+st.markdown("<p class='section-title'>TOTAIS GERAIS</p>", unsafe_allow_html=True)
 st.markdown(
-    "<h2 style='text-align: center;'>Distribuição de Inscrições por Cargo</h2>",
+    f"""
+    <div class="kpi-grid">
+        {kpi_card("Total de Inscritos", total_i, "accent")}
+        {kpi_card("Total Validados",    total_v, "green")}
+        {kpi_card("Total Invalidados",  total_x, "orange")}
+    </div>
+    """,
     unsafe_allow_html=True
 )
 
-df_totals = pd.DataFrame({
-    'Cargo': ['Professor', 'Supervisor'],
-    'Total de Inscrições': [total_inscritos_prof, total_inscritos_sup]
+st.markdown("<hr class='styled-divider'>", unsafe_allow_html=True)
+
+# Row 2 – per cargo
+st.markdown("<p class='section-title'>POR CARGO</p>", unsafe_allow_html=True)
+
+col_p, col_s, col_a = st.columns(3)
+
+def cargo_block(col, label, total, valid, invalid, emoji):
+    with col:
+        st.markdown(
+            f"""
+            <div class="kpi-card" style="padding:20px 16px;">
+                <div class="kpi-label">{emoji} {label}</div>
+                <div class="kpi-value accent" style="font-size:34px;">{total:,}</div>
+                <div class="badge-row" style="margin-top:14px;">
+                    <span class="badge badge-valid">✔ {valid:,} válidos</span>
+                    <span class="badge badge-invalid">✖ {invalid:,} inv.</span>
+                </div>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+
+cargo_block(col_p, "Professor",  t_prof_i,  t_prof_v,  t_prof_x,  "🎓")
+cargo_block(col_s, "Supervisor", t_sup_i,   t_sup_v,   t_sup_x,   "🔍")
+cargo_block(col_a, "Apoio",      t_apoio_i, t_apoio_v, t_apoio_x, "🤝")
+
+st.markdown("<hr class='styled-divider'>", unsafe_allow_html=True)
+
+# ── Bar chart ────────────────────────────────────────────────────────────────
+st.markdown("<p class='section-title'>DISTRIBUIÇÃO DE INSCRIÇÕES POR CARGO</p>", unsafe_allow_html=True)
+
+df_chart = pd.DataFrame({
+    'Cargo': ['Professor', 'Supervisor', 'Apoio',
+              'Professor', 'Supervisor', 'Apoio',
+              'Professor', 'Supervisor', 'Apoio'],
+    'Categoria': (['Inscritos']*3 + ['Validados']*3 + ['Invalidados']*3),
+    'Quantidade': [
+        t_prof_i,  t_sup_i,  t_apoio_i,
+        t_prof_v,  t_sup_v,  t_apoio_v,
+        t_prof_x,  t_sup_x,  t_apoio_x,
+    ]
 })
 
-chart = alt.Chart(df_totals).mark_bar().encode(
-    x=alt.X('Cargo:N', axis=alt.Axis(labelFontSize=14, titleFontSize=16)),
-    y=alt.Y('Total de Inscrições:Q', axis=alt.Axis(labelFontSize=14, titleFontSize=16)),
-    color=alt.Color('Cargo:N', legend=None, scale=alt.Scale(scheme='tableau10')),
-    tooltip=['Cargo', 'Total de Inscrições']
-).properties(
-    width=500,
-    height=350
+color_scale = alt.Scale(
+    domain=['Inscritos', 'Validados', 'Invalidados'],
+    range=['#3182ce', '#38a169', '#dd6b20']
+)
+
+chart = (
+    alt.Chart(df_chart)
+    .mark_bar(cornerRadiusTopLeft=4, cornerRadiusTopRight=4)
+    .encode(
+        x=alt.X('Categoria:N',
+                axis=alt.Axis(labelFontSize=12, labelAngle=0, title=None, labelColor='#475569'),
+                sort=['Inscritos', 'Validados', 'Invalidados']),
+        y=alt.Y('Quantidade:Q',
+                axis=alt.Axis(labelFontSize=12, labelColor='#475569', gridColor='#e2e8f0'),
+                title='Quantidade'),
+        color=alt.Color('Categoria:N',
+                        scale=color_scale,
+                        legend=alt.Legend(orient='top', labelFontSize=12, titleFontSize=13,
+                                          labelColor='#1e293b', titleColor='#1e293b')),
+        column=alt.Column('Cargo:N',
+                          header=alt.Header(
+                              labelFontSize=13,
+                              labelColor='#1e293b',
+                              titleFontSize=0,
+                          )),
+        tooltip=['Cargo', 'Categoria', 'Quantidade']
+    )
+    .properties(width=220, height=300)
+    .configure_view(strokeWidth=0)
+    .configure_axis(domainColor='#cbd5e1')
+    .configure_legend(labelColor='#1e293b', titleColor='#1e293b')
 )
 
 st.altair_chart(chart, use_container_width=True)
 
-st.markdown("---")
+st.markdown("<hr class='styled-divider'>", unsafe_allow_html=True)
 
-# Selection and search
-cargo_selecionado = st.radio('SELECIONE O CARGO', ['PROFESSOR', 'SUPERVISOR'], key='cargo_radio')
-search_term = st.text_input('BUSCAR POR CIDADE OU VAGA', key='search_input')
+# ── Tabela detalhada ─────────────────────────────────────────────────────────
+st.markdown("<p class='section-title'>DETALHAMENTO POR VAGA</p>", unsafe_allow_html=True)
 
-# Select DataFrame
-df_selected = df_prof.copy() if cargo_selecionado == 'PROFESSOR' else df_sup.copy()
+cargo_selecionado = st.radio(
+    'Selecione o cargo',
+    ['PROFESSOR', 'SUPERVISOR', 'APOIO'],
+    horizontal=True,
+    key='cargo_radio'
+)
 
-# Filter
+search_term = st.text_input('🔍  Buscar por cidade ou vaga', key='search_input')
+
+cargo_map = {
+    'PROFESSOR':  df_prof,
+    'SUPERVISOR': df_sup,
+    'APOIO':      df_apoio,
+}
+df_sel = cargo_map[cargo_selecionado].copy()
+
 if search_term:
-    df_selected = df_selected[df_selected['VAGA'].str.contains(search_term, case=False, na=False)].reset_index(drop=True)
+    df_sel = df_sel[
+        df_sel['VAGA'].str.contains(search_term, case=False, na=False)
+    ].reset_index(drop=True)
 
-# AgGrid configuration
-if not df_selected.empty:
-    gb = GridOptionsBuilder.from_dataframe(df_selected)
+if not df_sel.empty:
+    gb = GridOptionsBuilder.from_dataframe(df_sel)
     gb.configure_default_column(editable=False, groupable=False)
-    gb.configure_column("VAGA", header_name="Vaga", sortable=True, filter=True, width=600)
-    gb.configure_column("INSCRITOS", header_name="Inscritos", sortable=True, filter=True, width=100)
+    gb.configure_column("VAGA",        header_name="Vaga",        sortable=True, filter=True, flex=3)
+    gb.configure_column("INSCRITOS",   header_name="Inscritos",   sortable=True, filter=True, flex=1)
+    gb.configure_column("VALIDADOS",   header_name="Validados",   sortable=True, filter=True, flex=1)
+    gb.configure_column("INVALIDADOS", header_name="Invalidados", sortable=True, filter=True, flex=1)
     gb.configure_pagination(paginationAutoPageSize=False, paginationPageSize=rows_per_page)
-    gb.configure_grid_options(rowHeight=25)
-    gb.configure_default_column(cellStyle={'font-size': '11px'})
-    
-    gridOptions = gb.build()
-    
-    st.markdown(
-        f"<h2 style='text-align: center;'>Inscrições - {cargo_selecionado}</h2>",
-        unsafe_allow_html=True
-    )
-    
+    gb.configure_grid_options(rowHeight=28)
+    gb.configure_default_column(cellStyle={'font-size': '12px'})
+
     AgGrid(
-        df_selected,
-        gridOptions=gridOptions,
+        df_sel,
+        gridOptions=gb.build(),
         enable_enterprise_modules=False,
-        height=350,
+        height=380,
         fit_columns_on_grid_load=True,
         theme='material',
         update_mode='MODEL_CHANGED',
@@ -203,9 +411,6 @@ if not df_selected.empty:
 else:
     st.info("Nenhum dado encontrado para os filtros selecionados.")
 
-# Footer
-st.markdown("---")
-st.markdown(
-    "<h5 style='text-align: center; color: var(--text-color);'>GEECT</h5>",
-    unsafe_allow_html=True
-)
+# ── Footer ───────────────────────────────────────────────────────────────────
+st.markdown("<hr class='styled-divider'>", unsafe_allow_html=True)
+st.markdown("<div class='footer'>GEECT</div>", unsafe_allow_html=True)
