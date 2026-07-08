@@ -341,35 +341,36 @@ color_scale = alt.Scale(
     range=['#3182ce', '#38a169', '#dd6b20']
 )
 
+# Um único gráfico agrupado (Cargo no eixo X, barras lado a lado por Categoria)
+# em vez do antigo "column" facetado — aquele tinha largura fixa em pixels por
+# painel e estourava a página em telas menores. Com width='container' +
+# use_container_width=True, o gráfico sempre se ajusta ao espaço disponível.
 chart = (
     alt.Chart(df_chart)
-    .mark_bar(cornerRadiusTopLeft=4, cornerRadiusTopRight=4)
+    .mark_bar(cornerRadiusTopLeft=4, cornerRadiusTopRight=4, size=32)
     .encode(
-        x=alt.X('Categoria:N',
-                axis=alt.Axis(labelFontSize=12, labelAngle=0, title=None, labelColor='#475569'),
-                sort=['Inscritos', 'Validados', 'Invalidados']),
+        x=alt.X('Cargo:N',
+                axis=alt.Axis(labelFontSize=13, labelAngle=0, title=None, labelColor='#1e293b'),
+                sort=['Supervisor', 'Apoio']),
+        xOffset=alt.XOffset('Categoria:N', sort=['Inscritos', 'Validados', 'Invalidados']),
         y=alt.Y('Quantidade:Q',
                 axis=alt.Axis(labelFontSize=12, labelColor='#475569', gridColor='#e2e8f0'),
                 title='Quantidade'),
         color=alt.Color('Categoria:N',
                         scale=color_scale,
+                        sort=['Inscritos', 'Validados', 'Invalidados'],
                         legend=alt.Legend(orient='top', labelFontSize=12, titleFontSize=13,
                                           labelColor='#1e293b', titleColor='#1e293b')),
-        column=alt.Column('Cargo:N',
-                          header=alt.Header(
-                              labelFontSize=13,
-                              labelColor='#1e293b',
-                              titleFontSize=0,
-                          )),
         tooltip=['Cargo', 'Categoria', 'Quantidade']
     )
-    .properties(width=280, height=300)
+    .properties(width='container', height=280)
     .configure_view(strokeWidth=0)
     .configure_axis(domainColor='#cbd5e1')
     .configure_legend(labelColor='#1e293b', titleColor='#1e293b')
 )
 
 st.altair_chart(chart, use_container_width=True)
+
 
 st.markdown("<hr class='styled-divider'>", unsafe_allow_html=True)
 
