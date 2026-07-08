@@ -137,10 +137,14 @@ st.markdown(
 
         /* AgGrid wrapper */
         .ag-theme-material {
-            max-width: 800px;
+            max-width: 100%;
             margin: 0 auto;
             border-radius: 12px;
             overflow: hidden;
+        }
+        .ag-theme-material .ag-cell {
+            white-space: normal !important;
+            word-break: break-word;
         }
 
         /* Footer */
@@ -390,14 +394,34 @@ if search_term:
 
 if not df_sel.empty:
     gb = GridOptionsBuilder.from_dataframe(df_sel)
-    gb.configure_default_column(editable=False, groupable=False)
-    gb.configure_column("VAGA",        header_name="Vaga",        sortable=True, filter=True, flex=3)
-    gb.configure_column("INSCRITOS",   header_name="Inscritos",   sortable=True, filter=True, flex=1)
-    gb.configure_column("VALIDADOS",   header_name="Validados",   sortable=True, filter=True, flex=1)
-    gb.configure_column("INVALIDADOS", header_name="Invalidados", sortable=True, filter=True, flex=1)
+    gb.configure_default_column(
+        editable=False,
+        groupable=False,
+        resizable=True,
+        cellStyle={'font-size': '12px'},
+    )
+    # Coluna "Vaga": em vez de truncar o texto, quebramos a linha (wrapText)
+    # e deixamos a altura da linha se ajustar automaticamente (autoHeight),
+    # assim o público leigo enxerga o nome completo sem precisar redimensionar nada.
+    gb.configure_column(
+        "VAGA",
+        header_name="Vaga",
+        sortable=True,
+        filter=True,
+        flex=4,
+        minWidth=320,
+        wrapText=True,
+        autoHeight=True,
+        tooltipField="VAGA",  # ao passar o mouse, também mostra o texto completo
+        cellStyle={'font-size': '12px', 'lineHeight': '1.3', 'padding-top': '6px', 'padding-bottom': '6px'},
+    )
+    gb.configure_column("INSCRITOS",   header_name="Inscritos",   sortable=True, filter=True, flex=1, minWidth=100)
+    gb.configure_column("VALIDADOS",   header_name="Validados",   sortable=True, filter=True, flex=1, minWidth=100)
+    gb.configure_column("INVALIDADOS", header_name="Invalidados", sortable=True, filter=True, flex=1, minWidth=100)
     gb.configure_pagination(paginationAutoPageSize=False, paginationPageSize=rows_per_page)
-    gb.configure_grid_options(rowHeight=28)
-    gb.configure_default_column(cellStyle={'font-size': '12px'})
+    # rowHeight vira apenas uma referência mínima; com autoHeight a grade
+    # calcula a altura real de cada linha conforme o texto quebrado.
+    gb.configure_grid_options(rowHeight=28, domLayout='normal')
 
     AgGrid(
         df_sel,
@@ -407,6 +431,7 @@ if not df_sel.empty:
         fit_columns_on_grid_load=True,
         theme='material',
         update_mode='MODEL_CHANGED',
+        allow_unsafe_jscode=True,
         key=f'aggrid_{cargo_selecionado}'
     )
 else:
