@@ -413,28 +413,29 @@ if not df_sel.empty:
         sortable=True,
         filter=True,
         flex=6,
-        minWidth=180,
+        minWidth=260,
         wrapText=True,
         autoHeight=True,
         tooltipField="VAGA",
         cellStyle={'font-size': '14px', 'lineHeight': '1.3', 'padding-top': '6px', 'padding-bottom': '6px'},
     )
-    # Colunas numéricas: largura fixa e enxuta (sem flex), para sobrar o
-    # máximo de espaço possível para o nome da vaga.
+    # Colunas numéricas: largura fixa (sem flex) e ampla o bastante para o
+    # cabeçalho não cortar. suppressSizeToFit trava essa largura mesmo se
+    # algum recálculo automático do grid tentar reduzir.
     num_col_style = {'font-size': '14px', 'textAlign': 'center'}
     gb.configure_column(
         "INSCRITOS", header_name="Inscritos", sortable=True, filter=True,
-        width=90, minWidth=80, maxWidth=100, flex=0,
+        width=130, minWidth=120, flex=0, suppressSizeToFit=True,
         cellStyle=num_col_style,
     )
     gb.configure_column(
         "VALIDADOS", header_name="Validados", sortable=True, filter=True,
-        width=90, minWidth=80, maxWidth=100, flex=0,
+        width=130, minWidth=120, flex=0, suppressSizeToFit=True,
         cellStyle=num_col_style,
     )
     gb.configure_column(
         "INVALIDADOS", header_name="Invalidados", sortable=True, filter=True,
-        width=95, minWidth=85, maxWidth=105, flex=0,
+        width=140, minWidth=130, flex=0, suppressSizeToFit=True,
         cellStyle=num_col_style,
     )
     gb.configure_pagination(paginationAutoPageSize=False, paginationPageSize=rows_per_page)
@@ -444,8 +445,12 @@ if not df_sel.empty:
         df_sel,
         gridOptions=gb.build(),
         enable_enterprise_modules=False,
-        height=380,
-        fit_columns_on_grid_load=True,
+        height=420,
+        # IMPORTANTE: desativado. Esse parâmetro forçava o AgGrid a espremer
+        # todas as colunas (inclusive os cabeçalhos) para caber na tela,
+        # ignorando os "width"/"flex" definidos acima — era a causa do
+        # corte em "Ins...", "Vali...", "Inva...".
+        fit_columns_on_grid_load=False,
         theme='material',
         update_mode='MODEL_CHANGED',
         allow_unsafe_jscode=True,
