@@ -400,28 +400,40 @@ if not df_sel.empty:
         resizable=True,
         cellStyle={'font-size': '12px'},
     )
-    # Coluna "Vaga": em vez de truncar o texto, quebramos a linha (wrapText)
-    # e deixamos a altura da linha se ajustar automaticamente (autoHeight),
-    # assim o público leigo enxerga o nome completo sem precisar redimensionar nada.
+    # Coluna "Vaga": ocupa todo o espaço que sobrar (flex alto), com quebra de
+    # linha (wrapText) para nunca truncar o nome, mesmo em telas menores.
     gb.configure_column(
         "VAGA",
         header_name="Vaga",
         sortable=True,
         filter=True,
-        flex=4,
-        minWidth=320,
+        flex=6,
+        minWidth=180,
         wrapText=True,
         autoHeight=True,
-        tooltipField="VAGA",  # ao passar o mouse, também mostra o texto completo
+        tooltipField="VAGA",
         cellStyle={'font-size': '12px', 'lineHeight': '1.3', 'padding-top': '6px', 'padding-bottom': '6px'},
     )
-    gb.configure_column("INSCRITOS",   header_name="Inscritos",   sortable=True, filter=True, flex=1, minWidth=100)
-    gb.configure_column("VALIDADOS",   header_name="Validados",   sortable=True, filter=True, flex=1, minWidth=100)
-    gb.configure_column("INVALIDADOS", header_name="Invalidados", sortable=True, filter=True, flex=1, minWidth=100)
+    # Colunas numéricas: largura fixa e enxuta (sem flex), para sobrar o
+    # máximo de espaço possível para o nome da vaga.
+    num_col_style = {'font-size': '12px', 'textAlign': 'center'}
+    gb.configure_column(
+        "INSCRITOS", header_name="Inscritos", sortable=True, filter=True,
+        width=90, minWidth=80, maxWidth=100, flex=0,
+        cellStyle=num_col_style,
+    )
+    gb.configure_column(
+        "VALIDADOS", header_name="Validados", sortable=True, filter=True,
+        width=90, minWidth=80, maxWidth=100, flex=0,
+        cellStyle=num_col_style,
+    )
+    gb.configure_column(
+        "INVALIDADOS", header_name="Invalidados", sortable=True, filter=True,
+        width=95, minWidth=85, maxWidth=105, flex=0,
+        cellStyle=num_col_style,
+    )
     gb.configure_pagination(paginationAutoPageSize=False, paginationPageSize=rows_per_page)
-    # rowHeight vira apenas uma referência mínima; com autoHeight a grade
-    # calcula a altura real de cada linha conforme o texto quebrado.
-    gb.configure_grid_options(rowHeight=28, domLayout='normal')
+    gb.configure_grid_options(rowHeight=28, domLayout='normal', suppressHorizontalScroll=True)
 
     AgGrid(
         df_sel,
