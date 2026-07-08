@@ -21,7 +21,7 @@ st.markdown(
         }
 
         .block-container {
-            max-width: 1100px;
+            max-width: 1300px;
             padding-left: 2rem;
             padding-right: 2rem;
             padding-top: 1.5rem;
@@ -145,6 +145,11 @@ st.markdown(
         .ag-theme-material .ag-cell {
             white-space: normal !important;
             word-break: break-word;
+            font-size: 14px !important;
+        }
+        .ag-theme-material .ag-header-cell-text {
+            font-size: 13px !important;
+            font-weight: 600 !important;
         }
 
         /* Footer */
@@ -398,7 +403,7 @@ if not df_sel.empty:
         editable=False,
         groupable=False,
         resizable=True,
-        cellStyle={'font-size': '12px'},
+        cellStyle={'font-size': '14px'},
     )
     # Coluna "Vaga": ocupa todo o espaço que sobrar (flex alto), com quebra de
     # linha (wrapText) para nunca truncar o nome, mesmo em telas menores.
@@ -412,28 +417,28 @@ if not df_sel.empty:
         wrapText=True,
         autoHeight=True,
         tooltipField="VAGA",
-        cellStyle={'font-size': '12px', 'lineHeight': '1.3', 'padding-top': '6px', 'padding-bottom': '6px'},
+        cellStyle={'font-size': '14px', 'lineHeight': '1.3', 'padding-top': '6px', 'padding-bottom': '6px'},
     )
     # Colunas numéricas: largura fixa e enxuta (sem flex), para sobrar o
     # máximo de espaço possível para o nome da vaga.
-    num_col_style = {'font-size': '12px', 'textAlign': 'center'}
+    num_col_style = {'font-size': '14px', 'textAlign': 'center'}
     gb.configure_column(
         "INSCRITOS", header_name="Inscritos", sortable=True, filter=True,
-        width=120, minWidth=80, maxWidth=100, flex=0,
+        width=90, minWidth=80, maxWidth=100, flex=0,
         cellStyle=num_col_style,
     )
     gb.configure_column(
         "VALIDADOS", header_name="Validados", sortable=True, filter=True,
-        width=120, minWidth=80, maxWidth=100, flex=0,
+        width=90, minWidth=80, maxWidth=100, flex=0,
         cellStyle=num_col_style,
     )
     gb.configure_column(
         "INVALIDADOS", header_name="Invalidados", sortable=True, filter=True,
-        width=120, minWidth=85, maxWidth=105, flex=0,
+        width=95, minWidth=85, maxWidth=105, flex=0,
         cellStyle=num_col_style,
     )
     gb.configure_pagination(paginationAutoPageSize=False, paginationPageSize=rows_per_page)
-    gb.configure_grid_options(rowHeight=28, domLayout='normal', suppressHorizontalScroll=True)
+    gb.configure_grid_options(rowHeight=32, domLayout='normal', suppressHorizontalScroll=True)
 
     AgGrid(
         df_sel,
