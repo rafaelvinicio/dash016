@@ -419,17 +419,17 @@ if not df_sel.empty:
     num_col_style = {'font-size': '12px', 'textAlign': 'center'}
     gb.configure_column(
         "INSCRITOS", header_name="Inscritos", sortable=True, filter=True,
-        width=90, minWidth=80, maxWidth=100, flex=0,
+        width=120, minWidth=80, maxWidth=100, flex=0,
         cellStyle=num_col_style,
     )
     gb.configure_column(
         "VALIDADOS", header_name="Validados", sortable=True, filter=True,
-        width=90, minWidth=80, maxWidth=100, flex=0,
+        width=120, minWidth=80, maxWidth=100, flex=0,
         cellStyle=num_col_style,
     )
     gb.configure_column(
         "INVALIDADOS", header_name="Invalidados", sortable=True, filter=True,
-        width=95, minWidth=85, maxWidth=105, flex=0,
+        width=120, minWidth=85, maxWidth=105, flex=0,
         cellStyle=num_col_style,
     )
     gb.configure_pagination(paginationAutoPageSize=False, paginationPageSize=rows_per_page)
