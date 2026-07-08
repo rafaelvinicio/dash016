@@ -179,19 +179,19 @@ st.markdown(
 )
 
 # ── Banner ──────────────────────────────────────────────────────────────────
-st.markdown(
-    """
-    <div class="centered-banner">
-        <img src="https://i.postimg.cc/nhM4cdnw/banner6.png" alt="Banner" width="800">
-    </div>
-    """,
-    unsafe_allow_html=True
-)
+# st.markdown(
+#     """
+#     <div class="centered-banner">
+#         <img src="https://i.postimg.cc/nhM4cdnw/banner6.png" alt="Banner" width="800">
+#     </div>
+#     """,
+#     unsafe_allow_html=True
+# )
 
 st.markdown(
     "<h1 style='text-align:center;font-family:Space Grotesk,sans-serif;font-size:22px;"
     "font-weight:700;color:#1e293b;margin:18px 0 4px 0;letter-spacing:0.5px;'>"
-    "📈 Dashboard de Inscrições · Edital 004/2026</h1>",
+    "📈 Dashboard de Inscrições · Edital 015/2026</h1>",
     unsafe_allow_html=True
 )
 
@@ -203,7 +203,7 @@ with st.sidebar:
     rows_per_page = st.selectbox('Linhas por página', options=[25, 50, 100], index=0)
 
 # ── Load data ────────────────────────────────────────────────────────────────
-SPREADSHEET_ID = '1p0GTkCTsUcFbGWUUh8wwL5QdKXijtMf6x7fa88orlEk'
+SPREADSHEET_ID = '1h7zzuYiNnCHC36qmM5u2dakTdEpQb66OJ_YSC9C8hTc'
 EXPECTED_COLS = ['VAGA', 'INSCRITOS', 'VALIDADOS', 'INVALIDADOS']
 
 @st.cache_data(ttl=200)
@@ -237,7 +237,8 @@ def prepare(df, label):
         .reset_index(drop=True)
     )
 
-df_prof  = prepare(load_data(SPREADSHEET_ID, 'dashprof'),  'dashprof')
+# ── PROFESSOR: não há vaga para este cargo neste edital, dados desativados ──
+# df_prof  = prepare(load_data(SPREADSHEET_ID, 'dashprof'),  'dashprof')
 df_sup   = prepare(load_data(SPREADSHEET_ID, 'dashsup'),   'dashsup')
 df_apoio = prepare(load_data(SPREADSHEET_ID, 'dashapoio'), 'dashapoio')
 
@@ -250,13 +251,13 @@ def totals(df):
         int(df['INVALIDADOS'].sum()),
     )
 
-t_prof_i,  t_prof_v,  t_prof_x  = totals(df_prof)
+# t_prof_i,  t_prof_v,  t_prof_x  = totals(df_prof)
 t_sup_i,   t_sup_v,   t_sup_x   = totals(df_sup)
 t_apoio_i, t_apoio_v, t_apoio_x = totals(df_apoio)
 
-total_i = t_prof_i  + t_sup_i  + t_apoio_i
-total_v = t_prof_v  + t_sup_v  + t_apoio_v
-total_x = t_prof_x  + t_sup_x  + t_apoio_x
+total_i = t_sup_i  + t_apoio_i
+total_v = t_sup_v  + t_apoio_v
+total_x = t_sup_x  + t_apoio_x
 
 # ── KPI cards ────────────────────────────────────────────────────────────────
 def kpi_card(label, value, css_class="", sub=""):
@@ -284,10 +285,10 @@ st.markdown(
 
 st.markdown("<hr class='styled-divider'>", unsafe_allow_html=True)
 
-# Row 2 – per cargo
+# Row 2 – por cargo (apenas Supervisor e Apoio; Professor não participa deste edital)
 st.markdown("<p class='section-title'>POR CARGO</p>", unsafe_allow_html=True)
 
-col_p, col_s, col_a = st.columns(3)
+col_s, col_a = st.columns(2)
 
 def cargo_block(col, label, total, valid, invalid, emoji):
     with col:
@@ -305,7 +306,7 @@ def cargo_block(col, label, total, valid, invalid, emoji):
             unsafe_allow_html=True
         )
 
-cargo_block(col_p, "Professor",  t_prof_i,  t_prof_v,  t_prof_x,  "🎓")
+# cargo_block(col_p, "Professor",  t_prof_i,  t_prof_v,  t_prof_x,  "🎓")
 cargo_block(col_s, "Supervisor", t_sup_i,   t_sup_v,   t_sup_x,   "🔍")
 cargo_block(col_a, "Apoio",      t_apoio_i, t_apoio_v, t_apoio_x, "🤝")
 
@@ -315,14 +316,14 @@ st.markdown("<hr class='styled-divider'>", unsafe_allow_html=True)
 st.markdown("<p class='section-title'>DISTRIBUIÇÃO DE INSCRIÇÕES POR CARGO</p>", unsafe_allow_html=True)
 
 df_chart = pd.DataFrame({
-    'Cargo': ['Professor', 'Supervisor', 'Apoio',
-              'Professor', 'Supervisor', 'Apoio',
-              'Professor', 'Supervisor', 'Apoio'],
-    'Categoria': (['Inscritos']*3 + ['Validados']*3 + ['Invalidados']*3),
+    'Cargo': ['Supervisor', 'Apoio',
+              'Supervisor', 'Apoio',
+              'Supervisor', 'Apoio'],
+    'Categoria': (['Inscritos']*2 + ['Validados']*2 + ['Invalidados']*2),
     'Quantidade': [
-        t_prof_i,  t_sup_i,  t_apoio_i,
-        t_prof_v,  t_sup_v,  t_apoio_v,
-        t_prof_x,  t_sup_x,  t_apoio_x,
+        t_sup_i,  t_apoio_i,
+        t_sup_v,  t_apoio_v,
+        t_sup_x,  t_apoio_x,
     ]
 })
 
@@ -353,7 +354,7 @@ chart = (
                           )),
         tooltip=['Cargo', 'Categoria', 'Quantidade']
     )
-    .properties(width=220, height=300)
+    .properties(width=280, height=300)
     .configure_view(strokeWidth=0)
     .configure_axis(domainColor='#cbd5e1')
     .configure_legend(labelColor='#1e293b', titleColor='#1e293b')
@@ -368,7 +369,7 @@ st.markdown("<p class='section-title'>DETALHAMENTO POR VAGA</p>", unsafe_allow_h
 
 cargo_selecionado = st.radio(
     'Selecione o cargo',
-    ['PROFESSOR', 'SUPERVISOR', 'APOIO'],
+    ['SUPERVISOR', 'APOIO'],   # 'PROFESSOR' removido: sem vagas neste edital
     horizontal=True,
     key='cargo_radio'
 )
@@ -376,7 +377,7 @@ cargo_selecionado = st.radio(
 search_term = st.text_input('🔍  Buscar por cidade ou vaga', key='search_input')
 
 cargo_map = {
-    'PROFESSOR':  df_prof,
+    # 'PROFESSOR':  df_prof,
     'SUPERVISOR': df_sup,
     'APOIO':      df_apoio,
 }
