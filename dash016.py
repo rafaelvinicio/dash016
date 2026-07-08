@@ -324,52 +324,64 @@ st.markdown("<hr class='styled-divider'>", unsafe_allow_html=True)
 # ── Bar chart ────────────────────────────────────────────────────────────────
 st.markdown("<p class='section-title'>DISTRIBUIÇÃO DE INSCRIÇÕES POR CARGO</p>", unsafe_allow_html=True)
 
-df_chart = pd.DataFrame({
-    'Cargo': ['Supervisor', 'Apoio',
-              'Supervisor', 'Apoio',
-              'Supervisor', 'Apoio'],
-    'Categoria': (['Inscritos']*2 + ['Validados']*2 + ['Invalidados']*2),
-    'Quantidade': [
-        t_sup_i,  t_apoio_i,
-        t_sup_v,  t_apoio_v,
-        t_sup_x,  t_apoio_x,
-    ]
-})
-
 color_scale = alt.Scale(
     domain=['Inscritos', 'Validados', 'Invalidados'],
     range=['#3182ce', '#38a169', '#dd6b20']
 )
 
-# Um único gráfico agrupado (Cargo no eixo X, barras lado a lado por Categoria)
-# em vez do antigo "column" facetado — aquele tinha largura fixa em pixels por
-# painel e estourava a página em telas menores. Com width='container' +
-# use_container_width=True, o gráfico sempre se ajusta ao espaço disponível.
-chart = (
-    alt.Chart(df_chart)
-    .mark_bar(cornerRadiusTopLeft=4, cornerRadiusTopRight=4, size=32)
-    .encode(
-        x=alt.X('Cargo:N',
-                axis=alt.Axis(labelFontSize=13, labelAngle=0, title=None, labelColor='#1e293b'),
-                sort=['Supervisor', 'Apoio']),
-        xOffset=alt.XOffset('Categoria:N', sort=['Inscritos', 'Validados', 'Invalidados']),
-        y=alt.Y('Quantidade:Q',
-                axis=alt.Axis(labelFontSize=12, labelColor='#475569', gridColor='#e2e8f0'),
-                title='Quantidade'),
-        color=alt.Color('Categoria:N',
-                        scale=color_scale,
-                        sort=['Inscritos', 'Validados', 'Invalidados'],
-                        legend=alt.Legend(orient='top', labelFontSize=12, titleFontSize=13,
-                                          labelColor='#1e293b', titleColor='#1e293b')),
-        tooltip=['Cargo', 'Categoria', 'Quantidade']
+def build_cargo_chart(inscritos, validados, invalidados):
+    """Gráfico de barras simples (sem xOffset/column) — compatível com
+    qualquer versão do Altair e sempre responsivo via width='container'."""
+    df = pd.DataFrame({
+        'Categoria': ['Inscritos', 'Validados', 'Invalidados'],
+        'Quantidade': [inscritos, validados, invalidados],
+    })
+    return (
+        alt.Chart(df)
+        .mark_bar(cornerRadiusTopLeft=4, cornerRadiusTopRight=4, size=36)
+        .encode(
+            x=alt.X('Categoria:N',
+                    axis=alt.Axis(labelFontSize=12, labelAngle=0, title=None, labelColor='#475569'),
+                    sort=['Inscritos', 'Validados', 'Invalidados']),
+            y=alt.Y('Quantidade:Q',
+                    axis=alt.Axis(labelFontSize=11, labelColor='#475569', gridColor='#e2e8f0'),
+                    title='Quantidade'),
+            color=alt.Color('Categoria:N', scale=color_scale, legend=None),
+            tooltip=['Categoria', 'Quantidade']
+        )
+        .properties(width='container', height=220)
+        .configure_view(strokeWidth=0)
+        .configure_axis(domainColor='#cbd5e1')
     )
-    .properties(width='container', height=280)
-    .configure_view(strokeWidth=0)
-    .configure_axis(domainColor='#cbd5e1')
-    .configure_legend(labelColor='#1e293b', titleColor='#1e293b')
+
+# Duas colunas — uma por cargo — cada gráfico se ajusta à largura da sua
+# própria coluna (use_container_width=True), então nunca estoura a página.
+chart_col_s, chart_col_a = st.columns(2)
+with chart_col_s:
+    st.markdown(
+        "<p style='text-align:center;font-size:13px;font-weight:600;color:#1e293b;margin-bottom:4px;'>🔍 Supervisor</p>",
+        unsafe_allow_html=True
+    )
+    st.altair_chart(build_cargo_chart(t_sup_i, t_sup_v, t_sup_x), use_container_width=True)
+with chart_col_a:
+    st.markdown(
+        "<p style='text-align:center;font-size:13px;font-weight:600;color:#1e293b;margin-bottom:4px;'>🤝 Apoio</p>",
+        unsafe_allow_html=True
+    )
+    st.altair_chart(build_cargo_chart(t_apoio_i, t_apoio_v, t_apoio_x), use_container_width=True)
+
+# Legenda compartilhada (já que os gráficos individuais estão sem legend própria)
+st.markdown(
+    """
+    <div class="badge-row" style="margin-top:6px;">
+        <span class="badge" style="background:rgba(49,130,206,0.08);color:#3182ce;border:1px solid rgba(49,130,206,0.25);">● Inscritos</span>
+        <span class="badge badge-valid">● Validados</span>
+        <span class="badge badge-invalid">● Invalidados</span>
+    </div>
+    """,
+    unsafe_allow_html=True
 )
 
-st.altair_chart(chart, use_container_width=True)
 
 
 st.markdown("<hr class='styled-divider'>", unsafe_allow_html=True)
