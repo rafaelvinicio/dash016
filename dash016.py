@@ -200,7 +200,7 @@ st.markdown(
 st.markdown(
     "<h1 style='text-align:center;font-family:Space Grotesk,sans-serif;font-size:22px;"
     "font-weight:700;color:#1e293b;margin:18px 0 4px 0;letter-spacing:0.5px;'>"
-    "📈 Dashboard de Inscrições · Edital 015/2026</h1>",
+    "📈 Dashboard de Inscrições · Edital 019/2026</h1>",
     unsafe_allow_html=True
 )
 
@@ -249,7 +249,7 @@ def prepare(df, label):
 # ── PROFESSOR: não há vaga para este cargo neste edital, dados desativados ──
 # df_prof  = prepare(load_data(SPREADSHEET_ID, 'dashprof'),  'dashprof')
 df_sup   = prepare(load_data(SPREADSHEET_ID, 'dashsup'),   'dashsup')
-df_apoio = prepare(load_data(SPREADSHEET_ID, 'dashapoio'), 'dashapoio')
+df_PROFESSOR = prepare(load_data(SPREADSHEET_ID, 'dashPROFESSOR'), 'dashPROFESSOR')
 
 def totals(df):
     if df.empty:
@@ -262,11 +262,11 @@ def totals(df):
 
 # t_prof_i,  t_prof_v,  t_prof_x  = totals(df_prof)
 t_sup_i,   t_sup_v,   t_sup_x   = totals(df_sup)
-t_apoio_i, t_apoio_v, t_apoio_x = totals(df_apoio)
+t_PROFESSOR_i, t_PROFESSOR_v, t_PROFESSOR_x = totals(df_PROFESSOR)
 
-total_i = t_sup_i  + t_apoio_i
-total_v = t_sup_v  + t_apoio_v
-total_x = t_sup_x  + t_apoio_x
+total_i = t_sup_i  + t_PROFESSOR_i
+total_v = t_sup_v  + t_PROFESSOR_v
+total_x = t_sup_x  + t_PROFESSOR_x
 
 # ── KPI cards ────────────────────────────────────────────────────────────────
 def kpi_card(label, value, css_class="", sub=""):
@@ -294,7 +294,7 @@ st.markdown(
 
 st.markdown("<hr class='styled-divider'>", unsafe_allow_html=True)
 
-# Row 2 – por cargo (apenas Supervisor e Apoio; Professor não participa deste edital)
+# Row 2 – por cargo (apenas Supervisor e PROFESSOR; Professor não participa deste edital)
 st.markdown("<p class='section-title'>POR CARGO</p>", unsafe_allow_html=True)
 
 col_s, col_a = st.columns(2)
@@ -317,7 +317,7 @@ def cargo_block(col, label, total, valid, invalid, emoji):
 
 # cargo_block(col_p, "Professor",  t_prof_i,  t_prof_v,  t_prof_x,  "🎓")
 cargo_block(col_s, "Supervisor", t_sup_i,   t_sup_v,   t_sup_x,   "🔍")
-cargo_block(col_a, "Apoio",      t_apoio_i, t_apoio_v, t_apoio_x, "🤝")
+cargo_block(col_a, "PROFESSOR",      t_PROFESSOR_i, t_PROFESSOR_v, t_PROFESSOR_x, "🤝")
 
 st.markdown("<hr class='styled-divider'>", unsafe_allow_html=True)
 
@@ -365,10 +365,10 @@ with chart_col_s:
     st.altair_chart(build_cargo_chart(t_sup_i, t_sup_v, t_sup_x), use_container_width=True)
 with chart_col_a:
     st.markdown(
-        "<p style='text-align:center;font-size:13px;font-weight:600;color:#1e293b;margin-bottom:4px;'>🤝 Apoio</p>",
+        "<p style='text-align:center;font-size:13px;font-weight:600;color:#1e293b;margin-bottom:4px;'>🤝 PROFESSOR</p>",
         unsafe_allow_html=True
     )
-    st.altair_chart(build_cargo_chart(t_apoio_i, t_apoio_v, t_apoio_x), use_container_width=True)
+    st.altair_chart(build_cargo_chart(t_PROFESSOR_i, t_PROFESSOR_v, t_PROFESSOR_x), use_container_width=True)
 
 # Legenda compartilhada (já que os gráficos individuais estão sem legend própria)
 st.markdown(
@@ -391,7 +391,7 @@ st.markdown("<p class='section-title'>DETALHAMENTO POR VAGA</p>", unsafe_allow_h
 
 cargo_selecionado = st.radio(
     'Selecione o cargo',
-    ['SUPERVISOR', 'APOIO'],   # 'PROFESSOR' removido: sem vagas neste edital
+    ['SUPERVISOR', 'PROFESSOR'],   # 'PROFESSOR' removido: sem vagas neste edital
     horizontal=True,
     key='cargo_radio'
 )
@@ -401,7 +401,7 @@ search_term = st.text_input('🔍  Buscar por cidade ou vaga', key='search_input
 cargo_map = {
     # 'PROFESSOR':  df_prof,
     'SUPERVISOR': df_sup,
-    'APOIO':      df_apoio,
+    'PROFESSOR':      df_PROFESSOR,
 }
 df_sel = cargo_map[cargo_selecionado].copy()
 
