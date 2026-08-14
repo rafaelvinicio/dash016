@@ -140,6 +140,10 @@ st.markdown(
             max-width: 100%;
             margin: 0 auto;
             border-radius: 12px;
+            overflow: visible;
+        }
+        .ag-theme-material .ag-root-wrapper {
+            border-radius: 12px;
             overflow: hidden;
         }
         .ag-theme-material .ag-cell {
@@ -150,6 +154,14 @@ st.markdown(
         .ag-theme-material .ag-header-cell-text {
             font-size: 13px !important;
             font-weight: 600 !important;
+        }
+        .ag-theme-material .ag-paging-panel {
+            font-size: 13px !important;
+            color: #1e293b !important;
+            height: 44px !important;
+        }
+        .ag-theme-material .ag-paging-button {
+            cursor: pointer;
         }
 
         /* Footer */
@@ -358,7 +370,6 @@ if not df_sel.empty:
         flex=6,
         minWidth=260,
         wrapText=True,
-        autoHeight=True,
         tooltipField="VAGA",
         cellStyle={'font-size': '14px', 'lineHeight': '1.3', 'padding-top': '6px', 'padding-bottom': '6px'},
     )
@@ -371,13 +382,13 @@ if not df_sel.empty:
         cellStyle={'font-size': '14px', 'textAlign': 'center'},
     )
     gb.configure_pagination(paginationAutoPageSize=False, paginationPageSize=rows_per_page)
-    gb.configure_grid_options(rowHeight=32, domLayout='normal', suppressHorizontalScroll=True)
+    gb.configure_grid_options(rowHeight=44, domLayout='normal')
 
     AgGrid(
         df_sel,
         gridOptions=gb.build(),
         enable_enterprise_modules=False,
-        height=420,
+        height=460,
         # IMPORTANTE: desativado. Esse parâmetro forçava o AgGrid a espremer
         # todas as colunas (inclusive os cabeçalhos) para caber na tela,
         # ignorando os "width"/"flex" definidos acima — era a causa do
