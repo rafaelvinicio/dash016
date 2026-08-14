@@ -212,7 +212,7 @@ with st.sidebar:
     rows_per_page = st.selectbox('Linhas por página', options=[25, 50, 100], index=0)
 
 # ── Load data ────────────────────────────────────────────────────────────────
-SPREADSHEET_ID = '1h7zzuYiNnCHC36qmM5u2dakTdEpQb66OJ_YSC9C8hTc'
+SPREADSHEET_ID = '1qnX7mYrwIWr3zAE-Zbc5OYlh3RjdcPfdvPii1iycfkY'
 EXPECTED_COLS = ['VAGA', 'INSCRITOS', 'VALIDADOS', 'INVALIDADOS']
 
 @st.cache_data(ttl=200)
