@@ -162,26 +162,6 @@ st.markdown(
             padding: 16px 0 8px 0;
             font-family: 'DM Sans', sans-serif;
         }
-
-        /* Status badges */
-        .badge-row {
-            display: flex;
-            justify-content: center;
-            gap: 24px;
-            margin-top: 10px;
-        }
-        .badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 12px;
-            font-weight: 600;
-            letter-spacing: 0.6px;
-            padding: 4px 12px;
-            border-radius: 20px;
-        }
-        .badge-valid   { background: rgba(39,103,73,0.08);  color: #276749; border: 1px solid rgba(39,103,73,0.25); }
-        .badge-invalid { background: rgba(192,86,33,0.08);  color: #c05621; border: 1px solid rgba(192,86,33,0.25); }
     </style>
     """,
     unsafe_allow_html=True
@@ -213,7 +193,7 @@ with st.sidebar:
 
 # ── Load data ────────────────────────────────────────────────────────────────
 SPREADSHEET_ID = '1qnX7mYrwIWr3zAE-Zbc5OYlh3RjdcPfdvPii1iycfkY'
-EXPECTED_COLS = ['VAGA', 'INSCRITOS', 'VALIDADOS', 'INVALIDADOS']
+EXPECTED_COLS = ['VAGA', 'INSCRITOS']
 
 @st.cache_data(ttl=200)
 def load_data(spreadsheet_id, sheet_name):
@@ -224,9 +204,8 @@ def load_data(spreadsheet_id, sheet_name):
         )
         df = pd.read_csv(url)
         df.columns = df.columns.str.strip()
-        for col in ['INSCRITOS', 'VALIDADOS', 'INVALIDADOS']:
-            if col in df.columns:
-                df[col] = pd.to_numeric(df[col], errors='coerce').fillna(0).astype(int)
+        if 'INSCRITOS' in df.columns:
+            df['INSCRITOS'] = pd.to_numeric(df['INSCRITOS'], errors='coerce').fillna(0).astype(int)
         if 'VAGA' in df.columns:
             df['VAGA'] = df['VAGA'].astype(str).str.strip()
         return df
@@ -253,22 +232,16 @@ df_PROFESSOR = prepare(load_data(SPREADSHEET_ID, 'dashPROFESSOR'), 'dashPROFESSO
 
 def totals(df):
     if df.empty:
-        return 0, 0, 0
-    return (
-        int(df['INSCRITOS'].sum()),
-        int(df['VALIDADOS'].sum()),
-        int(df['INVALIDADOS'].sum()),
-    )
+        return 0
+    return int(df['INSCRITOS'].sum())
 
-# t_prof_i,  t_prof_v,  t_prof_x  = totals(df_prof)
-t_sup_i,   t_sup_v,   t_sup_x   = totals(df_sup)
-t_PROFESSOR_i, t_PROFESSOR_v, t_PROFESSOR_x = totals(df_PROFESSOR)
+# t_prof_i = totals(df_prof)
+t_sup_i        = totals(df_sup)
+t_PROFESSOR_i  = totals(df_PROFESSOR)
 
-total_i = t_sup_i  + t_PROFESSOR_i
-total_v = t_sup_v  + t_PROFESSOR_v
-total_x = t_sup_x  + t_PROFESSOR_x
+total_i = t_sup_i + t_PROFESSOR_i
 
-# ── KPI cards ────────────────────────────────────────────────────────────────
+# ── KPI card ─────────────────────────────────────────────────────────────────
 def kpi_card(label, value, css_class="", sub=""):
     sub_html = f"<div class='kpi-sub'>{sub}</div>" if sub else ""
     return f"""
@@ -279,14 +252,12 @@ def kpi_card(label, value, css_class="", sub=""):
     </div>
     """
 
-# Row 1 – grand totals
-st.markdown("<p class='section-title'>TOTAIS GERAIS</p>", unsafe_allow_html=True)
+# Total geral
+st.markdown("<p class='section-title'>TOTAL GERAL</p>", unsafe_allow_html=True)
 st.markdown(
     f"""
-    <div class="kpi-grid">
+    <div class="kpi-grid" style="grid-template-columns: 1fr;max-width:340px;margin-left:auto;margin-right:auto;">
         {kpi_card("Total de Inscritos", total_i, "accent")}
-        {kpi_card("Total Validados",    total_v, "green")}
-        {kpi_card("Total Invalidados",  total_x, "orange")}
     </div>
     """,
     unsafe_allow_html=True
@@ -294,95 +265,54 @@ st.markdown(
 
 st.markdown("<hr class='styled-divider'>", unsafe_allow_html=True)
 
-# Row 2 – por cargo (apenas Supervisor e PROFESSOR; Professor não participa deste edital)
+# Por cargo (apenas Supervisor e PROFESSOR; Professor não participa deste edital)
 st.markdown("<p class='section-title'>POR CARGO</p>", unsafe_allow_html=True)
 
 col_s, col_a = st.columns(2)
 
-def cargo_block(col, label, total, valid, invalid, emoji):
+def cargo_block(col, label, total, emoji):
     with col:
         st.markdown(
             f"""
             <div class="kpi-card" style="padding:20px 16px;">
                 <div class="kpi-label">{emoji} {label}</div>
                 <div class="kpi-value accent" style="font-size:34px;">{total:,}</div>
-                <div class="badge-row" style="margin-top:14px;">
-                    <span class="badge badge-valid">✔ {valid:,} válidos</span>
-                    <span class="badge badge-invalid">✖ {invalid:,} inv.</span>
-                </div>
             </div>
             """,
             unsafe_allow_html=True
         )
 
-# cargo_block(col_p, "Professor",  t_prof_i,  t_prof_v,  t_prof_x,  "🎓")
-cargo_block(col_s, "Supervisor", t_sup_i,   t_sup_v,   t_sup_x,   "🔍")
-cargo_block(col_a, "PROFESSOR",      t_PROFESSOR_i, t_PROFESSOR_v, t_PROFESSOR_x, "🤝")
+# cargo_block(col_p, "Professor", t_prof_i, "🎓")
+cargo_block(col_s, "Supervisor", t_sup_i,       "🔍")
+cargo_block(col_a, "PROFESSOR",  t_PROFESSOR_i, "🤝")
 
 st.markdown("<hr class='styled-divider'>", unsafe_allow_html=True)
 
 # ── Bar chart ────────────────────────────────────────────────────────────────
-st.markdown("<p class='section-title'>DISTRIBUIÇÃO DE INSCRIÇÕES POR CARGO</p>", unsafe_allow_html=True)
+st.markdown("<p class='section-title'>INSCRIÇÕES POR CARGO</p>", unsafe_allow_html=True)
 
-color_scale = alt.Scale(
-    domain=['Inscritos', 'Validados', 'Invalidados'],
-    range=['#3182ce', '#38a169', '#dd6b20']
+df_chart = pd.DataFrame({
+    'Cargo': ['Supervisor', 'PROFESSOR'],
+    'Inscritos': [t_sup_i, t_PROFESSOR_i],
+})
+
+chart = (
+    alt.Chart(df_chart)
+    .mark_bar(cornerRadiusTopLeft=4, cornerRadiusTopRight=4, size=60)
+    .encode(
+        x=alt.X('Cargo:N',
+                axis=alt.Axis(labelFontSize=12, labelAngle=0, title=None, labelColor='#475569')),
+        y=alt.Y('Inscritos:Q',
+                axis=alt.Axis(labelFontSize=11, labelColor='#475569', gridColor='#e2e8f0'),
+                title='Inscritos'),
+        color=alt.value('#3182ce'),
+        tooltip=['Cargo', 'Inscritos']
+    )
+    .properties(width='container', height=260)
+    .configure_view(strokeWidth=0)
+    .configure_axis(domainColor='#cbd5e1')
 )
-
-def build_cargo_chart(inscritos, validados, invalidados):
-    """Gráfico de barras simples (sem xOffset/column) — compatível com
-    qualquer versão do Altair e sempre responsivo via width='container'."""
-    df = pd.DataFrame({
-        'Categoria': ['Inscritos', 'Validados', 'Invalidados'],
-        'Quantidade': [inscritos, validados, invalidados],
-    })
-    return (
-        alt.Chart(df)
-        .mark_bar(cornerRadiusTopLeft=4, cornerRadiusTopRight=4, size=36)
-        .encode(
-            x=alt.X('Categoria:N',
-                    axis=alt.Axis(labelFontSize=12, labelAngle=0, title=None, labelColor='#475569'),
-                    sort=['Inscritos', 'Validados', 'Invalidados']),
-            y=alt.Y('Quantidade:Q',
-                    axis=alt.Axis(labelFontSize=11, labelColor='#475569', gridColor='#e2e8f0'),
-                    title='Quantidade'),
-            color=alt.Color('Categoria:N', scale=color_scale, legend=None),
-            tooltip=['Categoria', 'Quantidade']
-        )
-        .properties(width='container', height=220)
-        .configure_view(strokeWidth=0)
-        .configure_axis(domainColor='#cbd5e1')
-    )
-
-# Duas colunas — uma por cargo — cada gráfico se ajusta à largura da sua
-# própria coluna (use_container_width=True), então nunca estoura a página.
-chart_col_s, chart_col_a = st.columns(2)
-with chart_col_s:
-    st.markdown(
-        "<p style='text-align:center;font-size:13px;font-weight:600;color:#1e293b;margin-bottom:4px;'>🔍 Supervisor</p>",
-        unsafe_allow_html=True
-    )
-    st.altair_chart(build_cargo_chart(t_sup_i, t_sup_v, t_sup_x), use_container_width=True)
-with chart_col_a:
-    st.markdown(
-        "<p style='text-align:center;font-size:13px;font-weight:600;color:#1e293b;margin-bottom:4px;'>🤝 PROFESSOR</p>",
-        unsafe_allow_html=True
-    )
-    st.altair_chart(build_cargo_chart(t_PROFESSOR_i, t_PROFESSOR_v, t_PROFESSOR_x), use_container_width=True)
-
-# Legenda compartilhada (já que os gráficos individuais estão sem legend própria)
-st.markdown(
-    """
-    <div class="badge-row" style="margin-top:6px;">
-        <span class="badge" style="background:rgba(49,130,206,0.08);color:#3182ce;border:1px solid rgba(49,130,206,0.25);">● Inscritos</span>
-        <span class="badge badge-valid">● Validados</span>
-        <span class="badge badge-invalid">● Invalidados</span>
-    </div>
-    """,
-    unsafe_allow_html=True
-)
-
-
+st.altair_chart(chart, use_container_width=True)
 
 st.markdown("<hr class='styled-divider'>", unsafe_allow_html=True)
 
@@ -432,24 +362,13 @@ if not df_sel.empty:
         tooltipField="VAGA",
         cellStyle={'font-size': '14px', 'lineHeight': '1.3', 'padding-top': '6px', 'padding-bottom': '6px'},
     )
-    # Colunas numéricas: largura fixa (sem flex) e ampla o bastante para o
+    # Coluna numérica: largura fixa (sem flex) e ampla o bastante para o
     # cabeçalho não cortar. suppressSizeToFit trava essa largura mesmo se
     # algum recálculo automático do grid tentar reduzir.
-    num_col_style = {'font-size': '14px', 'textAlign': 'center'}
     gb.configure_column(
         "INSCRITOS", header_name="Inscritos", sortable=True, filter=True,
         width=130, minWidth=120, flex=0, suppressSizeToFit=True,
-        cellStyle=num_col_style,
-    )
-    gb.configure_column(
-        "VALIDADOS", header_name="Validados", sortable=True, filter=True,
-        width=130, minWidth=120, flex=0, suppressSizeToFit=True,
-        cellStyle=num_col_style,
-    )
-    gb.configure_column(
-        "INVALIDADOS", header_name="Invalidados", sortable=True, filter=True,
-        width=140, minWidth=130, flex=0, suppressSizeToFit=True,
-        cellStyle=num_col_style,
+        cellStyle={'font-size': '14px', 'textAlign': 'center'},
     )
     gb.configure_pagination(paginationAutoPageSize=False, paginationPageSize=rows_per_page)
     gb.configure_grid_options(rowHeight=32, domLayout='normal', suppressHorizontalScroll=True)
