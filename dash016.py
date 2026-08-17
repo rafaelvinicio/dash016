@@ -178,7 +178,13 @@ st.markdown("<hr class='styled-divider'>", unsafe_allow_html=True)
 # ── Sidebar ──────────────────────────────────────────────────────────────────
 with st.sidebar:
     st.markdown("## ⚙️ Configurações")
-    rows_per_page = st.selectbox('Linhas por página', options=[25, 50, 100], index=0)
+    altura_tabela = st.selectbox(
+        'Altura da tabela',
+        options=['Compacta', 'Média', 'Grande'],
+        index=1
+    )
+    ALTURA_MAP = {'Compacta': 420, 'Média': 600, 'Grande': 820}
+    table_height = ALTURA_MAP[altura_tabela]
 
 # ── Load data ────────────────────────────────────────────────────────────────
 SPREADSHEET_ID = '1qnX7mYrwIWr3zAE-Zbc5OYlh3RjdcPfdvPii1iycfkY'
@@ -330,6 +336,7 @@ if search_term:
     ].reset_index(drop=True)
 
 if not df_sel.empty:
+    st.caption(f"{len(df_sel)} vaga(s) encontrada(s)")
     gb = GridOptionsBuilder.from_dataframe(df_sel)
     gb.configure_default_column(
         editable=False,
@@ -358,14 +365,13 @@ if not df_sel.empty:
         width=130, minWidth=120, flex=0, suppressSizeToFit=True,
         cellStyle={'font-size': '14px', 'textAlign': 'center'},
     )
-    gb.configure_pagination(paginationAutoPageSize=False, paginationPageSize=rows_per_page)
     gb.configure_grid_options(rowHeight=40, domLayout='normal')
 
     AgGrid(
         df_sel,
         gridOptions=gb.build(),
         enable_enterprise_modules=False,
-        height=520,
+        height=table_height,
         # IMPORTANTE: desativado. Esse parâmetro forçava o AgGrid a espremer
         # todas as colunas (inclusive os cabeçalhos) para caber na tela,
         # ignorando os "width"/"flex" definidos acima — era a causa do
@@ -375,34 +381,6 @@ if not df_sel.empty:
         update_mode='NO_UPDATE',
         allow_unsafe_jscode=True,
         key=f'aggrid_{cargo_selecionado}',
-        # O CSS injetado via st.markdown na página principal NÃO alcança o
-        # AgGrid, pois ele renderiza dentro de um <iframe> isolado. Por isso
-        # o rodapé de paginação era "comido" — precisa ir por aqui.
-        custom_css={
-            '.ag-root-wrapper': {
-                'border-radius': '12px !important',
-            },
-            '.ag-paging-panel': {
-                'height': '48px !important',
-                'min-height': '48px !important',
-                'display': 'flex !important',
-                'align-items': 'center !important',
-                'justify-content': 'flex-end !important',
-                'gap': '16px !important',
-                'font-size': '13px !important',
-                'color': '#1e293b !important',
-                'border-top': '1px solid #e2e8f0 !important',
-                'background': '#ffffff !important',
-                'overflow': 'visible !important',
-                'white-space': 'nowrap !important',
-                'flex-shrink': '0 !important',
-                'padding': '0 12px !important',
-            },
-            '.ag-paging-row-summary-panel, .ag-paging-page-summary-panel': {
-                'overflow': 'visible !important',
-                'white-space': 'nowrap !important',
-            },
-        }
     )
 else:
     st.info("Nenhum dado encontrado para os filtros selecionados.")
