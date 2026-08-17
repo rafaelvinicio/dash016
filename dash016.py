@@ -139,29 +139,6 @@ st.markdown(
         .ag-theme-material {
             max-width: 100%;
             margin: 0 auto;
-            border-radius: 12px;
-            overflow: visible;
-        }
-        .ag-theme-material .ag-root-wrapper {
-            border-radius: 12px;
-            overflow: hidden;
-        }
-        .ag-theme-material .ag-cell {
-            white-space: normal !important;
-            word-break: break-word;
-            font-size: 14px !important;
-        }
-        .ag-theme-material .ag-header-cell-text {
-            font-size: 13px !important;
-            font-weight: 600 !important;
-        }
-        .ag-theme-material .ag-paging-panel {
-            font-size: 13px !important;
-            color: #1e293b !important;
-            height: 44px !important;
-        }
-        .ag-theme-material .ag-paging-button {
-            cursor: pointer;
         }
 
         /* Footer */
@@ -382,13 +359,13 @@ if not df_sel.empty:
         cellStyle={'font-size': '14px', 'textAlign': 'center'},
     )
     gb.configure_pagination(paginationAutoPageSize=False, paginationPageSize=rows_per_page)
-    gb.configure_grid_options(rowHeight=44, domLayout='normal')
+    gb.configure_grid_options(rowHeight=40, domLayout='normal')
 
     AgGrid(
         df_sel,
         gridOptions=gb.build(),
         enable_enterprise_modules=False,
-        height=460,
+        height=520,
         # IMPORTANTE: desativado. Esse parâmetro forçava o AgGrid a espremer
         # todas as colunas (inclusive os cabeçalhos) para caber na tela,
         # ignorando os "width"/"flex" definidos acima — era a causa do
@@ -397,7 +374,35 @@ if not df_sel.empty:
         theme='material',
         update_mode='NO_UPDATE',
         allow_unsafe_jscode=True,
-        key=f'aggrid_{cargo_selecionado}'
+        key=f'aggrid_{cargo_selecionado}',
+        # O CSS injetado via st.markdown na página principal NÃO alcança o
+        # AgGrid, pois ele renderiza dentro de um <iframe> isolado. Por isso
+        # o rodapé de paginação era "comido" — precisa ir por aqui.
+        custom_css={
+            '.ag-root-wrapper': {
+                'border-radius': '12px !important',
+            },
+            '.ag-paging-panel': {
+                'height': '48px !important',
+                'min-height': '48px !important',
+                'display': 'flex !important',
+                'align-items': 'center !important',
+                'justify-content': 'flex-end !important',
+                'gap': '16px !important',
+                'font-size': '13px !important',
+                'color': '#1e293b !important',
+                'border-top': '1px solid #e2e8f0 !important',
+                'background': '#ffffff !important',
+                'overflow': 'visible !important',
+                'white-space': 'nowrap !important',
+                'flex-shrink': '0 !important',
+                'padding': '0 12px !important',
+            },
+            '.ag-paging-row-summary-panel, .ag-paging-page-summary-panel': {
+                'overflow': 'visible !important',
+                'white-space': 'nowrap !important',
+            },
+        }
     )
 else:
     st.info("Nenhum dado encontrado para os filtros selecionados.")
