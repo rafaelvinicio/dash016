@@ -395,7 +395,7 @@ if not df_sel.empty:
         # corte em "Ins...", "Vali...", "Inva...".
         fit_columns_on_grid_load=False,
         theme='material',
-        update_mode='MODEL_CHANGED',
+        update_mode='NO_UPDATE',
         allow_unsafe_jscode=True,
         key=f'aggrid_{cargo_selecionado}'
     )
